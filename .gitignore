@@ -3,3 +3,8 @@
 ################################################################################
 
 /CPLib/obj
+/CPLib/bin/Debug
+/CPPacker/bin/Debug
+/ObservableDictTest/bin/Debug
+/ObservableDictTest/obj
+/CPPacker/obj

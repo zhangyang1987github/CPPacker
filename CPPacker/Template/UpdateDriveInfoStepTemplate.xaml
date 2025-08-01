@@ -1,0 +1,374 @@
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"   xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="CPPacker.Template.UpdateDriveInfoStepTemplate" mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800" xmlns:micro="clr-namespace:System;assembly=mscorlib"
+			 xmlns:local="clr-namespace:CPPacker"
+			  xmlns:CPLib="https://vcloudpoint.net/CPLib" >
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+
+		<GroupBox Header="通用信息"   >
+			<DockPanel>
+				<Button DockPanel.Dock="Top" Content="添加信息" Width="100" HorizontalAlignment="Right" Command="{Binding AddFileDetailCommand}" />
+				<DataGrid ItemsSource="{Binding CommonDetail}"  AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" HeadersVisibility="None" GridLinesVisibility="None" Visibility="{Binding Info.Count, Converter={CPLib:CompareToTargetConverter Comparation=Bigger,CompareTarget={CPLib:GetInt32 Value=0},TrueResult={CPLib:GetVisibility Value=Visible}, FalseResult={CPLib:GetVisibility Value=Collapsed}}}" ContextMenuService.IsEnabled="{Binding RelativeSource={RelativeSource Mode=Self},Path=SelectedItems.Count,Converter={CPLib:CompareToTargetConverter Comparation=Bigger,CompareTarget={CPLib:GetInt32 Value=0}}}" Tag="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=DataGrid}}" SelectionMode="Extended">
+					<DataGrid.Columns>
+						<DataGridTemplateColumn Header="Key" Width="*">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<TextBox Text="{Binding Key,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBox>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTextColumn  Binding="{Binding Source='='}" IsReadOnly="True" Width="auto"></DataGridTextColumn>
+						<DataGridTemplateColumn Header="Value" Width="2*">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<ContentControl Content="{Binding Value}">
+										<ContentControl.ContentTemplate>
+											<DataTemplate>
+												<Grid x:Name="root">
+													<Grid.ColumnDefinitions>
+														<ColumnDefinition></ColumnDefinition>
+														<ColumnDefinition Width="auto"></ColumnDefinition>
+													</Grid.ColumnDefinitions>
+													<TextBox x:Name="tbFormat" Text="{Binding Format,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBox>
+													<Expander Grid.Column="1" Name="togArgs"></Expander>
+													<Popup Grid.ColumnSpan="999" StaysOpen="False" PlacementTarget="{Binding ElementName=root}" IsOpen="{Binding ElementName=togArgs,Path=IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Width="{Binding ElementName=root,Path=ActualWidth}"  >
+														<Grid  >
+															<Grid.RowDefinitions>
+																<RowDefinition></RowDefinition>
+																<RowDefinition Height="auto"></RowDefinition>
+															</Grid.RowDefinitions>
+															<DataGrid   ItemsSource="{Binding Args}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"   CanUserSortColumns="False" CanUserReorderColumns="False" CanUserResizeRows="False" CanUserResizeColumns="True"    >
+																<DataGrid.RowHeaderTemplate>
+																	<DataTemplate>
+																		<TextBlock>
+																				<Run Text="{}{"></Run>
+																				<Run >
+																					<Run.Text>
+																						<MultiBinding Converter="{local:RowIndexConverter}" Mode="OneWay">
+																						<Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=DataGridRow}" ></Binding>
+																						<Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=DataGrid}" Path="Items.Count"></Binding>
+																					</MultiBinding>
+																					</Run.Text>
+																				</Run>
+																				<Run Text="}"></Run>
+																		</TextBlock>
+																	</DataTemplate>
+																</DataGrid.RowHeaderTemplate>
+																<DataGrid.Columns>
+																	<DataGridTemplateColumn Header="参数类型" Width="auto">
+																		<DataGridTemplateColumn.CellTemplate>
+																			<DataTemplate>
+																				<ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Type,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+																					<ComboBoxItem Content="普通字符串" Tag="{x:Static local:EnumFormatArgType.Constant}"></ComboBoxItem>
+																					<ComboBoxItem Content="OEM字段" Tag="{x:Static local:EnumFormatArgType.OemField}"></ComboBoxItem>
+																					<ComboBoxItem Content="日期时间" Tag="{x:Static local:EnumFormatArgType.DateTime}"></ComboBoxItem>
+																					<ComboBoxItem Content="版本号" Tag="{x:Static local:EnumFormatArgType.Version}"></ComboBoxItem>
+																					<ComboBoxItem Content="文件名" Tag="{x:Static local:EnumFormatArgType.FileName}"></ComboBoxItem>
+																					<ComboBoxItem Content="文件名带扩展名" Tag="{x:Static local:EnumFormatArgType.FileNameWithExtension}"></ComboBoxItem>
+																				</ComboBox>
+																			</DataTemplate>
+																		</DataGridTemplateColumn.CellTemplate>
+																	</DataGridTemplateColumn>
+																	<DataGridTemplateColumn Header="值" Width="*"  >
+																		<DataGridTemplateColumn.CellTemplate>
+																			<DataTemplate>
+																				<ContentControl  Content="{Binding }">
+
+																					<ContentControl.Style>
+																						<Style TargetType="ContentControl">
+																							<Style.Setters>
+																								<Setter Property="ContentTemplate"  >
+																									<Setter.Value>
+																										<DataTemplate >
+																											<TextBlock x:Name="defaultTemplate"></TextBlock>
+																										</DataTemplate>
+																									</Setter.Value>
+																								</Setter>
+																							</Style.Setters>
+																							<Style.Triggers>
+																								<DataTrigger Binding="{Binding Type}" Value="{x:Static local:EnumFormatArgType.Constant}">
+																									<Setter Property="ContentTemplate"  >
+																										<Setter.Value>
+																											<DataTemplate >
+																												<TextBox Text="{Binding Extension,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBox>
+																											</DataTemplate>
+																										</Setter.Value>
+																									</Setter>
+																								</DataTrigger>
+																								<DataTrigger Binding="{Binding Type}" Value="{x:Static local:EnumFormatArgType.OemField}">
+																									<Setter Property="ContentTemplate" >
+																										<Setter.Value>
+																											<DataTemplate >
+																												<ComboBox IsEditable="True" 
+																															  ItemsSource="{Binding ElementName=lstVer,Path=DataContext.Parent.CacheData[OEM].Keys}"
+																															  Text="{Binding Extension,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></ComboBox>
+																											</DataTemplate>
+																										</Setter.Value>
+																									</Setter>
+																								</DataTrigger>
+
+																								<DataTrigger Binding="{Binding Type}" Value="{x:Static local:EnumFormatArgType.Version}">
+																									<Setter Property="ContentTemplate"  >
+																										<Setter.Value>
+																											<DataTemplate >
+																												<TextBlock Text="{Binding ElementName=lstVer,Path=DataContext.Parent.CacheData[VER]}" Foreground="LightGray"></TextBlock>
+																											</DataTemplate>
+																										</Setter.Value>
+																									</Setter>
+																								</DataTrigger>
+
+																							</Style.Triggers>
+																						</Style>
+																					</ContentControl.Style>
+																				</ContentControl>
+																			</DataTemplate>
+																		</DataGridTemplateColumn.CellTemplate>
+																	</DataGridTemplateColumn>
+																</DataGrid.Columns>
+																<DataGrid.ContextMenu>
+																	<ContextMenu>
+																		<MenuItem Header="添加参数"   >
+																			<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="普通字符串" CommandParameter="{x:Static local:EnumFormatArgType.Constant}"></MenuItem>
+																			<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="OEM字段" CommandParameter="{x:Static local:EnumFormatArgType.OemField}"></MenuItem>
+																			<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="日期时间" CommandParameter="{x:Static local:EnumFormatArgType.DateTime}"></MenuItem>
+																			<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="版本号" CommandParameter="{x:Static local:EnumFormatArgType.Version}"></MenuItem>
+																			<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="文件名" CommandParameter="{x:Static local:EnumFormatArgType.FileName}"></MenuItem>
+																			<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="文件名带扩展名" CommandParameter="{x:Static local:EnumFormatArgType.FileNameWithExtension}"></MenuItem>
+																		</MenuItem>
+																		<MenuItem Header="移除参数" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu},Path=PlacementTarget.DataContext.RemoveArgCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItems}"></MenuItem>
+																	</ContextMenu>
+																</DataGrid.ContextMenu>
+															</DataGrid>
+															<TextBlock Grid.Row="1" Text="在添加了参数的情况下，要显示'{'等字符需要进行转义" Margin="5"></TextBlock>
+														</Grid>
+													</Popup>
+												</Grid>
+											</DataTemplate>
+										</ContentControl.ContentTemplate>
+									</ContentControl>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+					</DataGrid.Columns>
+
+					<DataGrid.ContextMenu>
+						<ContextMenu>
+							<MenuItem Header="移除信息项" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu},Path=PlacementTarget.DataContext.RemoveFileDetailCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.SelectedItems}"></MenuItem>
+						</ContextMenu>
+					</DataGrid.ContextMenu>
+				</DataGrid>
+			</DockPanel>
+		</GroupBox>
+
+		<GroupBox Header="文件清单" Grid.Row="1">
+			<DockPanel  >
+				<Button DockPanel.Dock="Top" Content="添加文件" Width="100" HorizontalAlignment="Right" Command="{Binding AddFileCommand}" />
+				<DataGrid Grid.Row="1" x:Name="lstVer" Grid.IsSharedSizeScope="True" RowDetailsVisibilityMode="Visible" ItemsSource="{Binding Files}" SelectionMode="Extended" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HeadersVisibility="None" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" ContextMenuService.IsEnabled="{Binding RelativeSource={RelativeSource Mode=Self},Path=SelectedIndex,Converter={CPLib:CompareToTargetConverter Comparation=NotEquals, CompareTarget={CPLib:GetInt32 -1}}}">
+					<DataGrid.Columns>
+						<DataGridTextColumn Binding="{Binding File}" IsReadOnly="True" Width="*" FontSize="14">
+						</DataGridTextColumn>
+					</DataGrid.Columns>
+					<DataGrid.ContextMenu>
+						<ContextMenu>
+							<MenuItem Header="添加信息项" Command="{Binding PlacementTarget.SelectedItem.AddFileDetailCommand, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}, Mode=FindAncestor}}" IsEnabled="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu},Path=PlacementTarget.SelectedItems.Count,Converter={CPLib:CompareToTargetConverter CompareTarget={CPLib:GetInt32 Value=1}}}" />
+							<MenuItem Header="移除文件" Command="{Binding PlacementTarget.DataContext.RemoveFileCommand, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}, Mode=FindAncestor}}" CommandParameter="{Binding PlacementTarget.SelectedItems, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}, Mode=FindAncestor}}" />
+						</ContextMenu>
+					</DataGrid.ContextMenu>
+					<DataGrid.RowDetailsTemplate>
+						<DataTemplate>
+							<StackPanel>
+								<DataGrid ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid},Path=DataContext.CommonDetail}" GridLinesVisibility="None" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeRows="False" CanUserResizeColumns="False" CanUserSortColumns="False" HeadersVisibility="None">
+									<DataGrid.Columns>
+										<DataGridTemplateColumn Header="Key" Width="*">
+											<DataGridTemplateColumn.CellTemplate>
+												<DataTemplate>
+													<TextBox Text="{Binding Key}" IsReadOnly="True" Background="LightGray"></TextBox>
+												</DataTemplate>
+											</DataGridTemplateColumn.CellTemplate>
+										</DataGridTemplateColumn>
+										<DataGridTextColumn  Binding="{Binding Source='='}" IsReadOnly="True" Width="auto"></DataGridTextColumn>
+										<DataGridTemplateColumn Header="Value" Width="2*">
+											<DataGridTemplateColumn.CellTemplate>
+												<DataTemplate>
+													<ContentControl Content="{Binding Value}">
+														<ContentControl.ContentTemplate>
+															<DataTemplate>
+																<Grid x:Name="root">
+																	<Grid.ColumnDefinitions>
+																		<ColumnDefinition></ColumnDefinition>
+																		<ColumnDefinition Width="auto"></ColumnDefinition>
+																	</Grid.ColumnDefinitions>
+																	<TextBox x:Name="tbFormat" Text="{Binding Format}" IsReadOnly="True" Background="LightGray"></TextBox>
+																	<Expander Grid.Column="1" Name="togArgs"></Expander>
+																	<Popup Grid.ColumnSpan="999" StaysOpen="False" PlacementTarget="{Binding ElementName=root}" IsOpen="{Binding ElementName=togArgs,Path=IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Width="{Binding ElementName=root,Path=ActualWidth}"  >
+																	</Popup>
+																</Grid>
+															</DataTemplate>
+														</ContentControl.ContentTemplate>
+													</ContentControl>
+												</DataTemplate>
+											</DataGridTemplateColumn.CellTemplate>
+										</DataGridTemplateColumn>
+									</DataGrid.Columns>
+								</DataGrid>
+								<DataGrid ItemsSource="{Binding Info}"  AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" HeadersVisibility="None" GridLinesVisibility="None" Visibility="{Binding Info.Count, Converter={CPLib:CompareToTargetConverter Comparation=Bigger,CompareTarget={CPLib:GetInt32 Value=0},TrueResult={CPLib:GetVisibility Value=Visible}, FalseResult={CPLib:GetVisibility Value=Collapsed}}}" ContextMenuService.IsEnabled="{Binding RelativeSource={RelativeSource Mode=Self},Path=SelectedItems.Count,Converter={CPLib:CompareToTargetConverter Comparation=Bigger,CompareTarget={CPLib:GetInt32 Value=0}}}" Tag="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=DataGrid}}" SelectionMode="Extended">
+									<DataGrid.Columns>
+										<DataGridTemplateColumn Header="Key" Width="*">
+											<DataGridTemplateColumn.CellTemplate>
+												<DataTemplate>
+													<TextBox Text="{Binding Key,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBox>
+												</DataTemplate>
+											</DataGridTemplateColumn.CellTemplate>
+										</DataGridTemplateColumn>
+										<DataGridTextColumn  Binding="{Binding Source='='}" IsReadOnly="True" Width="auto"></DataGridTextColumn>
+										<DataGridTemplateColumn Header="Value" Width="2*">
+											<DataGridTemplateColumn.CellTemplate>
+												<DataTemplate>
+													<ContentControl Content="{Binding Value}">
+														<ContentControl.ContentTemplate>
+															<DataTemplate>
+																<Grid x:Name="root">
+																	<Grid.ColumnDefinitions>
+																		<ColumnDefinition></ColumnDefinition>
+																		<ColumnDefinition Width="auto"></ColumnDefinition>
+																	</Grid.ColumnDefinitions>
+																	<TextBox x:Name="tbFormat" Text="{Binding Format,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBox>
+																	<Expander Grid.Column="1" Name="togArgs"></Expander>
+																	<Popup Grid.ColumnSpan="999" StaysOpen="False" PlacementTarget="{Binding ElementName=root}" IsOpen="{Binding ElementName=togArgs,Path=IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Width="{Binding ElementName=root,Path=ActualWidth}"  >
+																		<Grid  >
+																			<Grid.RowDefinitions>
+																				<RowDefinition></RowDefinition>
+																				<RowDefinition Height="auto"></RowDefinition>
+																			</Grid.RowDefinitions>
+																			<DataGrid   ItemsSource="{Binding Args}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"   CanUserSortColumns="False" CanUserReorderColumns="False" CanUserResizeRows="False" CanUserResizeColumns="True"    >
+																				<DataGrid.RowHeaderTemplate>
+																					<DataTemplate>
+																						<TextBlock>
+																				<Run Text="{}{"></Run>
+																				<Run >
+																					<Run.Text>
+																						<MultiBinding Converter="{local:RowIndexConverter}" Mode="OneWay">
+																						<Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=DataGridRow}" ></Binding>
+																						<Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=DataGrid}" Path="Items.Count"></Binding>
+																					</MultiBinding>
+																					</Run.Text>
+																				</Run>
+																				<Run Text="}"></Run>
+																						</TextBlock>
+																					</DataTemplate>
+																				</DataGrid.RowHeaderTemplate>
+																				<DataGrid.Columns>
+																					<DataGridTemplateColumn Header="参数类型" Width="auto">
+																						<DataGridTemplateColumn.CellTemplate>
+																							<DataTemplate>
+																								<ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Type,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+																									<ComboBoxItem Content="普通字符串" Tag="{x:Static local:EnumFormatArgType.Constant}"></ComboBoxItem>
+																									<ComboBoxItem Content="OEM字段" Tag="{x:Static local:EnumFormatArgType.OemField}"></ComboBoxItem>
+																									<ComboBoxItem Content="日期时间" Tag="{x:Static local:EnumFormatArgType.DateTime}"></ComboBoxItem>
+																									<ComboBoxItem Content="版本号" Tag="{x:Static local:EnumFormatArgType.Version}"></ComboBoxItem>
+																									<ComboBoxItem Content="文件名" Tag="{x:Static local:EnumFormatArgType.FileName}"></ComboBoxItem>
+																									<ComboBoxItem Content="文件名带扩展名" Tag="{x:Static local:EnumFormatArgType.FileNameWithExtension}"></ComboBoxItem>
+																								</ComboBox>
+																							</DataTemplate>
+																						</DataGridTemplateColumn.CellTemplate>
+																					</DataGridTemplateColumn>
+																					<DataGridTemplateColumn Header="值" Width="*"  >
+																						<DataGridTemplateColumn.CellTemplate>
+																							<DataTemplate>
+																								<ContentControl  Content="{Binding }">
+
+																									<ContentControl.Style>
+																										<Style TargetType="ContentControl">
+																											<Style.Setters>
+																												<Setter Property="ContentTemplate"  >
+																													<Setter.Value>
+																														<DataTemplate >
+																															<TextBlock x:Name="defaultTemplate"></TextBlock>
+																														</DataTemplate>
+																													</Setter.Value>
+																												</Setter>
+																											</Style.Setters>
+																											<Style.Triggers>
+																												<DataTrigger Binding="{Binding Type}" Value="{x:Static local:EnumFormatArgType.Constant}">
+																													<Setter Property="ContentTemplate"  >
+																														<Setter.Value>
+																															<DataTemplate >
+																																<TextBox Text="{Binding Extension,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBox>
+																															</DataTemplate>
+																														</Setter.Value>
+																													</Setter>
+																												</DataTrigger>
+																												<DataTrigger Binding="{Binding Type}" Value="{x:Static local:EnumFormatArgType.OemField}">
+																													<Setter Property="ContentTemplate" >
+																														<Setter.Value>
+																															<DataTemplate >
+																																<ComboBox IsEditable="True" 
+																															  ItemsSource="{Binding ElementName=lstVer,Path=DataContext.Parent.CacheData[OEM].Keys}"
+																															  Text="{Binding Extension,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></ComboBox>
+																															</DataTemplate>
+																														</Setter.Value>
+																													</Setter>
+																												</DataTrigger>
+
+																												<DataTrigger Binding="{Binding Type}" Value="{x:Static local:EnumFormatArgType.Version}">
+																													<Setter Property="ContentTemplate"  >
+																														<Setter.Value>
+																															<DataTemplate >
+																																<TextBlock Text="{Binding ElementName=lstVer,Path=DataContext.Parent.CacheData[VER]}" Foreground="LightGray"></TextBlock>
+																															</DataTemplate>
+																														</Setter.Value>
+																													</Setter>
+																												</DataTrigger>
+
+																											</Style.Triggers>
+																										</Style>
+																									</ContentControl.Style>
+																								</ContentControl>
+																							</DataTemplate>
+																						</DataGridTemplateColumn.CellTemplate>
+																					</DataGridTemplateColumn>
+																				</DataGrid.Columns>
+																				<DataGrid.ContextMenu>
+																					<ContextMenu>
+																						<MenuItem Header="添加参数"   >
+																							<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="普通字符串" CommandParameter="{x:Static local:EnumFormatArgType.Constant}"></MenuItem>
+																							<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="OEM字段" CommandParameter="{x:Static local:EnumFormatArgType.OemField}"></MenuItem>
+																							<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="日期时间" CommandParameter="{x:Static local:EnumFormatArgType.DateTime}"></MenuItem>
+																							<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="版本号" CommandParameter="{x:Static local:EnumFormatArgType.Version}"></MenuItem>
+																							<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="文件名" CommandParameter="{x:Static local:EnumFormatArgType.FileName}"></MenuItem>
+																							<MenuItem Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.DataContext.AddArgCommand}" Header="文件名带扩展名" CommandParameter="{x:Static local:EnumFormatArgType.FileNameWithExtension}"></MenuItem>
+																						</MenuItem>
+																						<MenuItem Header="移除参数" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu},Path=PlacementTarget.DataContext.RemoveArgCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItems}"></MenuItem>
+																					</ContextMenu>
+																				</DataGrid.ContextMenu>
+																			</DataGrid>
+																			<TextBlock Grid.Row="1" Text="在添加了参数的情况下，要显示'{'等字符需要进行转义" Margin="5"></TextBlock>
+																		</Grid>
+																	</Popup>
+																</Grid>
+															</DataTemplate>
+														</ContentControl.ContentTemplate>
+													</ContentControl>
+												</DataTemplate>
+											</DataGridTemplateColumn.CellTemplate>
+										</DataGridTemplateColumn>
+									</DataGrid.Columns>
+									<DataGrid.ContextMenu>
+										<ContextMenu>
+											<MenuItem Header="移除信息项" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu},Path=PlacementTarget.DataContext.RemoveFileDetailCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ContextMenu},Path=PlacementTarget.SelectedItems}"></MenuItem>
+										</ContextMenu>
+									</DataGrid.ContextMenu>
+								</DataGrid>
+							</StackPanel>
+						</DataTemplate>
+					</DataGrid.RowDetailsTemplate>
+				</DataGrid>
+			</DockPanel>
+		</GroupBox>
+
+
+
+	</Grid>
+</UserControl>
