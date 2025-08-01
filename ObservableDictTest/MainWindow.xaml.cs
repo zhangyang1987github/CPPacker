@@ -30,8 +30,7 @@ namespace ObservableDictTest
         {
             InitializeComponent();
 
-
-
+            Console.WriteLine();
             this.DataContext = this.vm;
 
 
